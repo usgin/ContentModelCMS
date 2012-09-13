@@ -1,0 +1,3 @@
+[submodule "uriredirect"]
+	path = uriredirect
+	url = git@github.com:usgin/uriredirect.git
