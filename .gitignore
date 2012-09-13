@@ -1,4 +1,5 @@
 *.DS_Store
 *.pyc
 ContentModelCMS/settings.py
+media/
 

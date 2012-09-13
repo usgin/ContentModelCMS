@@ -1,0 +1,57 @@
+<ul id="all-content-models">
+  {% for cm in contentmodels %}
+    <li id="content-model-{{ cm.id }}">
+      <dl>
+        <dt>Title: </dt>
+        <dd class='cm-title'>{{ cm.title }}</dd>
+        
+        <dt>URI: </dt>
+        <dd class='cm-uri'>
+          <a href="{{ cm.uri }}">{{ cm.uri }}</a>
+        </dd>
+        
+        <dt>Last Updated: </dt>
+        <dd class='cm-date-updated'>{{ cm.date_updated }}</dd>
+        
+        <dt>Description: </dt>
+        <dd class='cm-description'>{{ cm.description|safe }}</dd>
+        
+        <dt>Discussion: </dt>
+        <dd class='cm-discussion'>{{ cm.discussion|safe }}</dd>
+        
+        <dt>Status: </dt>
+        <dd class='cm-status'>{{ cm.status|safe }}</dd>
+        
+        <dt>Available Versions: </dt>
+        <dd class='cm-versions'>
+          <ul>
+            {% for v in cm.modelversion_set.all %}
+              <li id="model-version-{{ v.id }}">
+                <dl>
+                  <dt>Version: </dt>
+                  <dd class='v-version'>{{ v.version }}</dd>
+                  
+                  <dt>URI: </dt>
+                  <dd class='v-uri'>{{ v.uri }}</dd>
+                  
+                  <dt>Date Created: </dt>
+                  <dd class='v-date-created'>{{ v.date_created }}</dd>
+                  
+                  <dt>XLS file: </dt>
+                  <dd class='v-xls-file'>
+                    <a href="{{ v.xls_file.url }}">{{ v.xls_filename }}</a>
+                  </dd>
+                  
+                  <dt>XSD file: </dt>
+                  <dd class='v-xsd-file'>
+                    <a href="{{ v.xsd_file.url }}">{{ v.xsd_filename }}</a>
+                  </dd>                                  
+                </dl>
+              </li>
+            {% endfor %}
+          </ul>
+        </dd>
+      </dl>
+    </li>
+  {% endfor %}
+</ul>
