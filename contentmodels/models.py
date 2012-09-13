@@ -19,7 +19,7 @@ class ContentModel(models.Model):
     
   # Define the class data members
   title = models.CharField(max_length=2500)
-  uri = models.CharField(max_length=2500)
+  uri = models.CharField(max_length=2500, unique=True)
   description = models.TextField()
   discussion = models.TextField(blank=True)
   status = models.TextField(blank=True)
@@ -76,7 +76,7 @@ class ModelVersion(models.Model):
     
   # Define the models data members
   content_model = models.ForeignKey('ContentModel')
-  version = models.CharField(max_length=5)
+  version = models.CharField(max_length=10)
   date_created = models.DateField(auto_now_add=True)
   xsd_file = models.FileField(upload_to=get_file_path)
   xls_file = models.FileField(upload_to=get_file_path)
