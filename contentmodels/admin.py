@@ -17,18 +17,24 @@ class ContentModelAdmin(admin.ModelAdmin):
     }    
     
   # Fields to display:
-  list_display = ['__unicode__', 'latest_xsd_file', 'latest_xls_file']
+  list_display = ['__unicode__', 'latest_xsd_link', 'latest_xls_link', 'rewrite_rule_link']
+  
+  # Fields to exclude from the edit form
+  exclude = ['rewrite_rule']
   
   # Fields on which to base the search:
-  search_fields = ['title']
+  search_fields = ['title', 'label']
 admin.site.register(ContentModel, ContentModelAdmin)
 
 #--------------------------------------------------------------------------------------
 # This class defines some customizations of the admin interface for ModelVersions  
 #--------------------------------------------------------------------------------------
 class ModelVersionAdmin(admin.ModelAdmin):
-  # Fields to display:
-  list_display = ['__unicode__', 'xsd_link', 'xls_link']
+  # Fields to display in the table:
+  list_display = ['__unicode__', 'xsd_link', 'xls_link', 'rewrite_rule_link']
+  
+  # Do not display a field to define a RewriteRule. This is done automatically.
+  exclude = ['rewrite_rule']
   
   # Fields to use in filtering on the right-hand-side:
   list_filter = ['content_model']

@@ -7,7 +7,7 @@
         
         <dt>URI: </dt>
         <dd class='cm-uri'>
-          <a href="{{ cm.uri }}">{{ cm.uri }}</a>
+          <a href="{{ cm.absolute_uri }}">{{ cm.absolute_uri }}</a>
         </dd>
         
         <dt>Last Updated: </dt>
@@ -32,19 +32,21 @@
                   <dd class='v-version'>{{ v.version }}</dd>
                   
                   <dt>URI: </dt>
-                  <dd class='v-uri'>{{ v.uri }}</dd>
+                  <dd class='v-uri'>
+                    <a href="{{ v.absolute_uri }}">{{ v.absolute_uri }}</a>
+                  </dd>
                   
                   <dt>Date Created: </dt>
                   <dd class='v-date-created'>{{ v.date_created }}</dd>
                   
                   <dt>XLS file: </dt>
                   <dd class='v-xls-file'>
-                    <a href="{{ v.xls_file.url }}">{{ v.xls_filename }}</a>
+                    <a href="{{ v.absolute_xls_path }}">{{ v.xls_filename }}</a>
                   </dd>
                   
                   <dt>XSD file: </dt>
                   <dd class='v-xsd-file'>
-                    <a href="{{ v.xsd_file.url }}">{{ v.xsd_filename }}</a>
+                    <a href="{{ v.absolute_xsd_path }}">{{ v.xsd_filename }}</a>
                   </dd>                                  
                 </dl>
               </li>

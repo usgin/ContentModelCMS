@@ -1,5 +1,9 @@
 from django.db import models
+from django.conf import settings
 from django.template.defaultfilters import slugify
+from django.db.models.signals import pre_save, post_save, post_delete
+from django.dispatch import receiver
+from uriconfigure import adjust_rewrite_rule, delete_rewrite_rule, update_related_rewrite_rules, RewriteRule, DEFAULT_REGISTER
 from os import path
 
 #--------------------------------------------------------------------------------------
@@ -19,10 +23,11 @@ class ContentModel(models.Model):
     
   # Define the class data members
   title = models.CharField(max_length=2500)
-  uri = models.CharField(max_length=2500, unique=True)
+  label = models.CharField(max_length=2500, unique=True)
   description = models.TextField()
   discussion = models.TextField(blank=True)
   status = models.TextField(blank=True)
+  rewrite_rule = models.OneToOneField(RewriteRule, null=True, blank=True)
   
   # Define the "display name" for an instance
   def __unicode__(self):
@@ -34,30 +39,66 @@ class ContentModel(models.Model):
   
   # Simple pointer to the latest version of a instance
   def latest_version(self):
-    return self.modelversion_set.latest('date_created')
+    if self.modelversion_set.count() > 0: return self.modelversion_set.latest('date_created')
+    else: return None
   
   # The updated date for an instance is the last time that a version was created
   def date_updated(self):
     return self.latest_version().date_created
   
+  # Return the absolute path to the latest version's XSD file
+  def absolute_latest_xsd_path(self):
+    version = self.latest_version()
+    if version is not None: return self.latest_version().absolute_xsd_path()
+    else: return None
+  
+  # Return the absolute path to the latest version's XLS file
+  def absolute_latest_xls_path(self):
+    version = self.latest_version()
+    if version is not None: return self.latest_version().absolute_xls_path()
+    else: return None
+  
   # Provide a link to the latest version's XSD file
-  def latest_xsd_file(self):
-    latest = self.latest_version()
-    return '<a href="%s">%s</a>' % (latest.xsd_file.url, latest.xsd_filename())
-  latest_xsd_file.allow_tags = True
+  def latest_xsd_link(self):
+    version = self.latest_version()
+    if version != None: return self.latest_version().xsd_link()
+    else: return None
+  latest_xsd_link.allow_tags = True
   
   # Provide a link to the latest version's XLS file
-  def latest_xls_file(self):
-    latest = self.latest_version()
-    return '<a href="%s">%s</a>' % (latest.xls_file.url, latest.xls_filename())
-  latest_xls_file.allow_tags = True
+  def latest_xls_link(self):
+    version = self.latest_version()
+    if version != None: return self.latest_version().xls_link()
+    else: return None
+  latest_xls_link.allow_tags = True
   
+  # Provide a URL for this ContentModel as HTML. Needs to be in sync with urls.py.
+  def my_html(self):
+    return '%s/contentmodel/%s.html' % (settings.BASE_URL.rstrip('/'), self.pk)
+  
+  # Provide a URL for this ContentModel as JSON. Needs to be in sync with urls.py.
+  def my_json(self):
+    return '%s/contentmodel/%s.json' % (settings.BASE_URL.rstrip('/'), self.pk)
+  
+  # Return RegEx pattern for use in UriRegister module
+  def regex_pattern(self):
+    return "xmlschema/%s/" % self.label
+        
+  # Provide this ContentModel's absolute URI
+  def absolute_uri(self):
+    return '%s/uri-gin/%s/%s' % (settings.BASE_URL.rstrip('/'), DEFAULT_REGISTER, self.regex_pattern())
+  
+  # Return a link to this ContentModel's RewriteRule
+  def rewrite_rule_link(self):
+    return '<a href="/admin/uriredirect/rewriterule/%s">Edit Rule</a>' % self.rewrite_rule.pk
+  rewrite_rule_link.allow_tags = True
+    
   # Return the instance as a dictionary that can be easily converted to JSON
   #   Include a list of versions relevant to this content model
   def serialized(self):
     as_json = {
       'title': self.title,
-      'uri': self.uri,
+      'uri': self.absolute_uri(),
       'description': self.description,
       'discussion': self.discussion,
       'status': self.status,
@@ -80,14 +121,15 @@ class ModelVersion(models.Model):
   date_created = models.DateField(auto_now_add=True)
   xsd_file = models.FileField(upload_to=get_file_path)
   xls_file = models.FileField(upload_to=get_file_path)
+  rewrite_rule = models.OneToOneField(RewriteRule, null=True, blank=True)
   
   # Define the "display name" for an instance
   def __unicode__(self):
     return '%s v. %s' % (self.content_model.title, self.version)
   
-  # Define the URI for this version -- it is simply the version number appended to the ContentModel.uri  
-  def uri(self):
-    return '%s/%s' % (self.content_model.uri.strip('/'), self.version)
+  # Define the absolute URI for this version -- it is simply the version number appended to the ContentModel.uri  
+  def absolute_uri(self):
+    return '%s/%s' % (self.content_model.absolute_uri().rstrip('/'), self.version)
   
   # Return just the base name of the XSD file without any associated file path
   def xsd_filename(self):
@@ -99,22 +141,57 @@ class ModelVersion(models.Model):
   
   # Return an HTML anchor tag for the XSD file
   def xsd_link(self):
-    return '<a href="%s">%s</a>' % (self.xsd_file.url, self.xsd_filename())
+    return '<a href="%s">%s</a>' % (self.absolute_xsd_path(), self.xsd_filename())
   xsd_link.allow_tags = True  # This lets the admin interface show the anchor
 
   # Return an HTML anchor tag for the XLS file
   def xls_link(self):
-    return '<a href="%s">%s</a>' % (self.xls_file.url, self.xls_filename())
+    return '<a href="%s">%s</a>' % (self.absolute_xls_path(), self.xls_filename())
   xls_link.allow_tags = True  # This lets the admin interface show the anchor
-        
+  
+  # Return absolute URL for XSD file
+  def absolute_xsd_path(self):
+    return '%s/%s' % (settings.BASE_URL.rstrip('/'), self.xsd_file.url.lstrip('/'))
+      
+  # Return absolute URL for XLS file
+  def absolute_xls_path(self):
+    return '%s/%s' % (settings.BASE_URL.rstrip('/'), self.xls_file.url.lstrip('/'))
+  
+  # Return RegEx pattern for use in UriRegister module
+  def regex_pattern(self):
+    return "%s/%s" % (self.content_model.regex_pattern().rstrip('/'), self.version)
+  
+  # Return a link to this ModelVersion's RewriteRule
+  def rewrite_rule_link(self):
+    return '<a href="/admin/uriredirect/rewriterule/%s">Edit Rule</a>' % self.rewrite_rule.pk
+  rewrite_rule_link.allow_tags = True
+  
   # Return the instance as a dictionary that can be easily converted to JSON.
   #   Contains URLs to directly download files 
   def serialized(self):
     as_json = {
-      'uri': self.uri(),
+      'uri': self.absolute_uri(),
       'version': self.version,
       'date_created': self.date_created.isoformat(),
-      'xsd_file_path': self.xsd_file.url,
-      'xls_file_path': self.xls_file.url
+      'xsd_file_path': self.absolute_xsd_path(),
+      'xls_file_path': self.absolute_xls_path()
     }    
     return as_json
+    
+#--------------------------------------------------------------------------------------
+# Register a function to fire before ModelVersion and ContentModel objects are saved
+#--------------------------------------------------------------------------------------    
+pre_save.connect(adjust_rewrite_rule, sender=ModelVersion)
+pre_save.connect(adjust_rewrite_rule, sender=ContentModel)
+
+#--------------------------------------------------------------------------------------
+# Register a function to fire after ModelVersion and ContentModel objects are saved
+#--------------------------------------------------------------------------------------    
+post_save.connect(update_related_rewrite_rules, sender=ModelVersion)
+post_save.connect(update_related_rewrite_rules, sender=ContentModel)
+
+#--------------------------------------------------------------------------------------
+# Register a function to fire when ModelVersion and ContentModel objects are deleted
+#--------------------------------------------------------------------------------------  
+post_delete.connect(delete_rewrite_rule, sender=ModelVersion)
+post_delete.connect(delete_rewrite_rule, sender=ContentModel)
