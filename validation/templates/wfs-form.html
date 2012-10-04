@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>WFS Validator</title>
+  </head>
+  <body>
+    <form action="/validate/wfs" method="POST">{% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>
