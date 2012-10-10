@@ -2,7 +2,7 @@ from contentmodels.models import ContentModel, ModelVersion
 from WfsCapabilities import WfsCapabilities
 from WfsGetFeature import WfsGetFeature
 from django import forms
-from django.http import HttpResponseNotAllowed, HttpResponse
+from django.http import HttpResponseNotAllowed
 from django.shortcuts import render
 
 #--------------------------------------------------------------------------------------
