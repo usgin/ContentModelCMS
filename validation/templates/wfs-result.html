@@ -16,7 +16,7 @@
   			<dt>Number of Features: </dt>
   			<dd>{{ number_of_features }}</dd>
   			
-  			<dt>Link to Response: </dt>
+  			<dt>Link to GetFeature Response: </dt>
   			<dd><a href="{{ url }}">GetFeature Document</a></dd>
   		</dl>
   	</div>
@@ -34,6 +34,7 @@
   		</dl>
   	</div>
   	<h2>The response <strong>{% if valid %}PASSED{% else %}FAILED{% endif %}</strong> validation.</h2>
+  	<p>The wfs:FeatureCollection contained {{ valid_elements }} valid {{ feature_type }} elements</p>
   	{% if errors %}
   	<ul>
   		{% for error in errors %}
