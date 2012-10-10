@@ -1,5 +1,6 @@
 from contentmodels.models import ContentModel, ModelVersion
 from WfsCapabilities import WfsCapabilities
+from WfsGetFeature import WfsGetFeature
 from django import forms
 from django.http import HttpResponseNotAllowed, HttpResponse
 from django.shortcuts import render
@@ -36,11 +37,11 @@ class WfsValidationParametersForm(forms.Form):
     super(forms.Form, self).__init__(*args, **kwargs)
     
     # Set the feature_type field's choices to the available WFS FeatureTypes
-    capabilities = WfsCapabilities(url)
-    self.fields['feature_type'].choices = [ (typename, typename) for typename in capabilities.feature_types ]
+    self.capabilities = WfsCapabilities(url)
+    self.fields['feature_type'].choices = [ (typename, typename) for typename in self.capabilities.feature_types ]
     
-    # Set the form object's capabilities_url
-    self.url = url
+    # Set the initial URL
+    self.fields['url'].initial = url
     
   # Define form fields
   url = forms.URLField(widget=forms.HiddenInput) 
@@ -49,34 +50,44 @@ class WfsValidationParametersForm(forms.Form):
   feature_type = forms.ChoiceField(choices=[])
   number_of_features = forms.IntegerField()
 
+#--------------------------------------------------------------------------------------
+# Here is the actual view function for /validate/wfs
+#--------------------------------------------------------------------------------------
 def validate_wfs_form(req):
   # Insure that HTTP requests are of the proper type
   allowed = [ 'GET', 'POST' ] 
   if req.method not in allowed:
     return HttpResponseNotAllowed(allowed)
   
-  # When a data is passed in during a POST request...  
-  if req.method is 'POST':
+  # When a data is passed in during a POST request...
+  if req.method == 'POST':
     # ... determine if the req.POST contains WfsSelectionForm or WfsValidationParametersForm
     
     # This is a WfsValidationParametersForm
     if 'version' in req.POST:
-      form = WfsValidationParametersForm(req.POST)
+      form = WfsValidationParametersForm(req.POST['url'], req.POST)
       
       # Check the form's validity
-      if form.is_valid:
+      if form.is_valid():
         # Perform WFS Validation
-        return HttpResponse('Now the WFS would be validated')
+        feature_type = form.cleaned_data['feature_type']
+        number_of_features = form.cleaned_data['number_of_features']
+        modelversion = form.cleaned_data['version']
+        get_feature_validator = WfsGetFeature(form.capabilities, feature_type, number_of_features)
+        valid, errors = get_feature_validator.validate(modelversion)
+        
+        return HttpResponse('The WFS is %s' % str(valid))
       
     # Otherwise it is treated as a WfsSelectionForm
     else:
       form = WfsSelectionForm(req.POST)
       
       # Check the form's validity
-      if form.is_valid:
+      if form.is_valid():
         # We need to send back a WfsValidationParametersForm, which takes a URL as input
-        second_form = WfsValidationParametersForm(url=form.cleaned_data['wfs_get_capabilities_url'])
-        return render(req, 'wfs-form.html', { 'form': second_form })
+        url = form.data['wfs_get_capabilities_url']
+        second_form = WfsValidationParametersForm(url)
+        return render(req, 'wfs-form.html', { 'form': second_form, 'url': url })
         
   # A GET request should just a data-free WfsSelectionForm
   else:

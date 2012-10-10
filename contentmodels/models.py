@@ -5,6 +5,7 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from uriconfigure import adjust_rewrite_rule, delete_rewrite_rule, update_related_rewrite_rules, RewriteRule, DEFAULT_REGISTER
 from os import path
+from lxml import etree
 
 #--------------------------------------------------------------------------------------
 # Function that gets the path for a uploaded files.
@@ -165,6 +166,14 @@ class ModelVersion(models.Model):
   def rewrite_rule_link(self):
     return '<a href="/admin/uriredirect/rewriterule/%s">Edit Rule</a>' % self.rewrite_rule.pk
   rewrite_rule_link.allow_tags = True
+  
+  # Return an lxml.etree.XMLSchema validator
+  def schema_validator(self):
+    # I don't know why this isn't working: schema_file = self.xsd_file.open()
+    schema_file = open(self.xsd_file.path, 'r')
+    schema_doc = etree.parse(schema_file)
+    schema = etree.XMLSchema(schema_doc)
+    return schema
   
   # Return the instance as a dictionary that can be easily converted to JSON.
   #   Contains URLs to directly download files 
