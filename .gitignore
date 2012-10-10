@@ -2,5 +2,6 @@
 *.pyc
 ContentModelCMS/settings.py
 media/
+files/
 .project
 .pydevproject

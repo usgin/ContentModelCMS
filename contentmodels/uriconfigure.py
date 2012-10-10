@@ -2,10 +2,10 @@ from uriredirect.models import UriRegister, RewriteRule, MediaType, AcceptMappin
 from django.conf import settings
 
 #--------------------------------------------------------------------------------------
-# Utility function to retreive the default URI register
+# Utility function to retrieve the default URI register
 #--------------------------------------------------------------------------------------
 def get_default_register():
-  # Attempt to retreive the default register defined in the project's settings
+  # Attempt to retrieve the default register defined in the project's settings
   try:
     return UriRegister.objects.get(label=settings.URI_REGISTER_LABEL)
   
@@ -16,14 +16,9 @@ def get_default_register():
         url=settings.URI_REGISTER_URL, 
         can_be_resolved=True
       )
-      
-#--------------------------------------------------------------------------------------
-# Get the default register once within this module
-#--------------------------------------------------------------------------------------
-DEFAULT_REGISTER = get_default_register()
 
 #--------------------------------------------------------------------------------------
-# Utility function to retreive specific media types
+# Utility function to retrieve specific media types
 #--------------------------------------------------------------------------------------
 def get_media_type(kwargs):
   # Attempt to locate the requested media type
@@ -33,26 +28,30 @@ def get_media_type(kwargs):
   # This exception indicates that the media type doesn't yet exist. Create and return it.
   except MediaType.DoesNotExist:    
     return MediaType.objects.create(**kwargs)
-
+  
 #--------------------------------------------------------------------------------------
-# Get the four needed media types once within the module
+# Functions to get the four needed media types needed within the module
 #--------------------------------------------------------------------------------------
-XSD_MEDIA = get_media_type({
-  "mime_type": "application/xml",
-  "file_extension": "xsd"
-})
-XLS_MEDIA = get_media_type({
-  "mime_type": "application/vnd.ms-excel",
-  "file_extension": "xls"
-})
-HTML_MEDIA = get_media_type({
-  "mime_type": "text/html",
-  "file_extension": "html"
-})
-JSON_MEDIA = get_media_type({
-  "mime_type": "text/json",
-  "file_extension": "json"
-})
+def XSD_MEDIA():
+  return get_media_type({
+      "mime_type": "application/xml",
+      "file_extension": "xsd"
+    })
+def XLS_MEDIA(): 
+  return get_media_type({
+      "mime_type": "application/vnd.ms-excel",
+      "file_extension": "xls"
+    })
+def HTML_MEDIA():
+  return get_media_type({
+      "mime_type": "text/html",
+      "file_extension": "html"
+    })
+def JSON_MEDIA():
+  return get_media_type({
+      "mime_type": "text/json",
+      "file_extension": "json"
+    })
 
 #--------------------------------------------------------------------------------------
 # Function to define RewriteRule attributes from an object
@@ -60,7 +59,7 @@ JSON_MEDIA = get_media_type({
 #--------------------------------------------------------------------------------------
 def create_rule_attribs(instance):
   return {
-    "register": DEFAULT_REGISTER,
+    "register": get_default_register(),
     "label": instance.__unicode__(),
     "description": "Redirection rule for %s" % instance.__unicode__(),
     "pattern": instance.regex_pattern()
@@ -147,22 +146,24 @@ def configure_mapping(rewriterule, url, mediatype):
 # Function to create AcceptMappings for a ModelVersion
 #--------------------------------------------------------------------------------------
 def configure_version_mappings(instance, rule):
-  configure_mapping(rule, instance.absolute_xls_path(), XLS_MEDIA)
-  configure_mapping(rule, instance.absolute_xsd_path(), XSD_MEDIA)
-  configure_mapping(rule, instance.content_model.my_html(), HTML_MEDIA)
-  configure_mapping(rule, instance.content_model.my_json(), JSON_MEDIA)
+  configure_mapping(rule, instance.absolute_xls_path(), XLS_MEDIA())
+  configure_mapping(rule, instance.absolute_xsd_path(), XSD_MEDIA())
+  configure_mapping(rule, instance.content_model.my_html(), HTML_MEDIA())
+  configure_mapping(rule, instance.content_model.my_json(), JSON_MEDIA())
   
 #--------------------------------------------------------------------------------------
 # Function to create AcceptMappings for a ContentModel
 #--------------------------------------------------------------------------------------
 def configure_model_mappings(instance, rule):
-  configure_mapping(rule, instance.my_html(), HTML_MEDIA)
-  configure_mapping(rule, instance.my_json(), JSON_MEDIA)
+  # When you first create a ContentModel, the instance does not yet have an ID assigned.
+  #    instance.my_html() and my_json() return None, and AcceptMappings are incorrect.
+  configure_mapping(rule, instance.my_html(), HTML_MEDIA())
+  configure_mapping(rule, instance.my_json(), JSON_MEDIA())
   
   # File mappings depend on there being a ModelVersion in the set
   if instance.latest_version() is not None:    
-    configure_mapping(rule, instance.absolute_latest_xls_path(), XLS_MEDIA)
-    configure_mapping(rule, instance.absolute_latest_xsd_path(), XSD_MEDIA)
+    configure_mapping(rule, instance.absolute_latest_xls_path(), XLS_MEDIA())
+    configure_mapping(rule, instance.absolute_latest_xsd_path(), XSD_MEDIA())
   
 #--------------------------------------------------------------------------------------
 # This function manages RewriteRules defined by the uriredirect module.

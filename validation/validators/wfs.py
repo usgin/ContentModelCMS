@@ -76,7 +76,19 @@ def validate_wfs_form(req):
         get_feature_validator = WfsGetFeature(form.capabilities, feature_type, number_of_features)
         valid, errors = get_feature_validator.validate(modelversion)
         
-        return HttpResponse('The WFS is %s' % str(valid))
+        # Setup hash table for results rendering
+        context = {
+            "valid": valid,
+            "url": get_feature_validator.url,
+            "errors": errors,
+            "modelversion": modelversion,
+            "feature_type": feature_type,
+            "number_of_features": number_of_features,
+            "wfs_base_url": get_feature_validator.url.split('?')[0]
+          }
+        
+        # Render the results as HTML
+        return render(req, 'wfs-result.html', context)
       
     # Otherwise it is treated as a WfsSelectionForm
     else:

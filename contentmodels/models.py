@@ -2,8 +2,8 @@ from django.db import models
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.db.models.signals import pre_save, post_save, post_delete
-from django.dispatch import receiver
-from uriconfigure import adjust_rewrite_rule, delete_rewrite_rule, update_related_rewrite_rules, RewriteRule, DEFAULT_REGISTER
+#from django.dispatch import receiver
+from uriconfigure import adjust_rewrite_rule, delete_rewrite_rule, update_related_rewrite_rules, RewriteRule
 from os import path
 from lxml import etree
 
@@ -45,7 +45,15 @@ class ContentModel(models.Model):
   
   # The updated date for an instance is the last time that a version was created
   def date_updated(self):
-    return self.latest_version().date_created
+    version = self.latest_version()
+    if version is not None: return version.date_created
+    else: return None
+    
+  # Return the updated date as an ISO-formatted string
+  def iso_date_updated(self):
+    updated = self.date_updated()
+    if updated is not None: return updated.isoformat()
+    else: return None
   
   # Return the absolute path to the latest version's XSD file
   def absolute_latest_xsd_path(self):
@@ -87,7 +95,7 @@ class ContentModel(models.Model):
         
   # Provide this ContentModel's absolute URI
   def absolute_uri(self):
-    return '%s/uri-gin/%s/%s' % (settings.BASE_URL.rstrip('/'), DEFAULT_REGISTER, self.regex_pattern())
+    return '%s/uri-gin/%s/%s' % (settings.BASE_URL.rstrip('/'), settings.URI_REGISTER_LABEL, self.regex_pattern())
   
   # Return a link to this ContentModel's RewriteRule
   def rewrite_rule_link(self):
@@ -103,7 +111,7 @@ class ContentModel(models.Model):
       'description': self.description,
       'discussion': self.discussion,
       'status': self.status,
-      'date_updated': self.date_updated().isoformat(),
+      'date_updated': self.iso_date_updated(),
       'versions': [ mv.serialized() for mv in self.modelversion_set.all() ]
     }    
     return as_json
