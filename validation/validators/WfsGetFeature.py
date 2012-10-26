@@ -38,6 +38,7 @@ class WfsGetFeature(WfsBase):
 #--------------------------------------------------------------------------------------
 class ValidationResults():
   results = []
+  errors = []
   valid = True
   
   def __init__(self, elements, schema):
