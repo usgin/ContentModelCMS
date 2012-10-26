@@ -90,12 +90,15 @@ class ContentModel(models.Model):
     return '%s/contentmodel/%s.json' % (settings.BASE_URL.rstrip('/'), self.pk)
   
   # Return RegEx pattern for use in UriRegister module
+  def stripped_regex(self):
+    return "xmlschema/%s/" % self.label
+  
   def regex_pattern(self):
-    return "^xmlschema/%s/$" % self.label
+    return "^%s$" % self.stripped_regex()
         
   # Provide this ContentModel's absolute URI
   def absolute_uri(self):
-    return '%s/uri-gin/%s/%s' % (settings.BASE_URL.rstrip('/'), settings.URI_REGISTER_LABEL, self.regex_pattern())
+    return '%s/uri-gin/%s/%s' % (settings.BASE_URL.rstrip('/'), settings.URI_REGISTER_LABEL, self.stripped_regex())
   
   # Return a link to this ContentModel's RewriteRule
   def rewrite_rule_link(self):
@@ -168,7 +171,7 @@ class ModelVersion(models.Model):
   
   # Return RegEx pattern for use in UriRegister module
   def regex_pattern(self):
-    return "^%s/%s$" % (self.content_model.regex_pattern().replace('^','').replace('$','').rstrip('/'), self.version)
+    return "^%s/%s$" % (self.content_model.stripped_regex().rstrip('/'), self.version)
   
   # Return a link to this ModelVersion's RewriteRule
   def rewrite_rule_link(self):
