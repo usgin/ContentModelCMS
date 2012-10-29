@@ -137,6 +137,7 @@ class ModelVersion(models.Model):
   date_created = models.DateField(auto_now_add=True)
   xsd_file = models.FileField(upload_to=get_file_path)
   xls_file = models.FileField(upload_to=get_file_path)
+  sample_wfs_request = models.CharField(max_length=2000, blank=True)
   rewrite_rule = models.OneToOneField(RewriteRule, null=True, blank=True)
   
   # Define the "display name" for an instance
@@ -198,7 +199,8 @@ class ModelVersion(models.Model):
       'version': self.version,
       'date_created': self.date_created.isoformat(),
       'xsd_file_path': self.absolute_xsd_path(),
-      'xls_file_path': self.absolute_xls_path()
+      'xls_file_path': self.absolute_xls_path(),
+      'sample_wfs_request': self.sample_wfs_request
     }    
     return as_json
     

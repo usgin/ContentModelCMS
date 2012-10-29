@@ -29,6 +29,7 @@
             <cm:created>{{ v.date_created }}</cm:created>
             <cm:xlsfile>{{ v.absolute_xls_path }}</cm:xlsfile>
             <cm:xsdfile>{{ v.absolute_xsd_path }}</cm:xsdfile>
+            <cm:wfsexample>{{ v.sample_wfs_request }}</cm:wfsexample>
           </cm:version>
           {% endfor %}
         </cm:versions>
