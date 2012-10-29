@@ -89,6 +89,10 @@ class ContentModel(models.Model):
   def my_json(self):
     return '%s/contentmodel/%s.json' % (settings.BASE_URL.rstrip('/'), self.pk)
   
+  # Provide a URL for this ContentModel as Atom XML. Needs to be in sync with urls.py.
+  def my_atom(self):
+    return '%s/contentmodel/%s.xml' % (settings.BASE_URL.rstrip('/'), self.pk)
+    
   # Return RegEx pattern for use in UriRegister module
   def stripped_regex(self):
     return "xmlschema/%s/" % self.label

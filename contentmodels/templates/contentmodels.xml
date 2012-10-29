@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns:atom="http://www.w3.org/2005/Atom" xmlns:cm="http://schemas.usgin.org/contentmodels">
+  <atom:title>{{ feed.title }}</atom:title>
+  <atom:subtitle>{{ feed.subtitle }}</atom:subtitle>
+  <atom:link href="{{ feed.url }}" rel="self" />
+  <atom:id>{{ feed.id }}</atom:id>
+  <atom:updated>{{ feed.date }}</atom:updated>
+  <atom:author>
+    <atom:name>{{ feed.author_name }}</atom:name>
+    <atom:email>{{ feed.author_email }}</atom:email>
+  </atom:author>
+  {% for cm in contentmodels %}
+    <atom:entry>
+      <atom:id>{{ cm.absolute_uri }}</atom:id>
+      <atom:title>{{ cm.title }}</atom:title>
+      <atom:link rel="alternate" href="{{ cm.my_html }}" />
+      <atom:content type="application/xml">
+        <cm:title>{{ cm.title }}</cm:title>
+        <cm:uri>{{ cm.absolute_uri }}</cm:uri>
+        <cm:lastupdate>{{ cm.iso_date_updated }}</cm:lastupdate>
+        <cm:description>{{ cm.description }}</cm:description>
+        <cm:discussion>{{ cm.discussion }}</cm:discussion>
+        <cm:status>{{ cm.status }}</cm:status>
+        <cm:versions>
+          {% for v in cm.modelversion_set.all %}
+          <cm:version>
+            <cm:number>{{ v.version }}</cm:number>
+            <cm:uri>{{ v.absolute_uri }}</cm:uri>
+            <cm:created>{{ v.date_created }}</cm:created>
+            <cm:xlsfile>{{ v.absolute_xls_path }}</cm:xlsfile>
+            <cm:xsdfile>{{ v.absolute_xsd_path }}</cm:xsdfile>
+          </cm:version>
+          {% endfor %}
+        </cm:versions>
+      </atom:content>      
+    </atom:entry>
+  {% endfor %}
+</atom:feed>
