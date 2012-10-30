@@ -99,6 +99,17 @@ class AtomFeed(object):
     if self.contentmodels.count() == 1:
       # Set the feed's id and url to that of the passed in ContentModel
       self.url = self.contentmodels[0].my_atom()
-      self.id = self.contentmodels[0].my_atom()      
-    
+      self.id = self.contentmodels[0].my_atom()
+      
+#--------------------------------------------------------------------------------------
+# Homepage
+#--------------------------------------------------------------------------------------
+def homepage(req):
+  return render_to_response('home.html')
+  
+#--------------------------------------------------------------------------------------
+# Model view page
+#--------------------------------------------------------------------------------------
+def models(req):
+  return render_to_response('models.html', { 'contentmodels': ContentModel.objects.all() })
   

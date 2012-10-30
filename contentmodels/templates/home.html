@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-unit">
+  <h1>Geoscience Content Models</h1>
+  <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+  <p><a class="btn btn-primary btn-large" href="/about/">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+  <div class="span4">
+    <h2>Content Models</h2>
+    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+    <p><a class="btn" href="/models/">View details &raquo;</a></p>
+  </div>
+  <div class="span4">
+    <h2>WFS Validator</h2>
+    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+    <p><a class="btn" href="/validator/">View details &raquo;</a></p>
+ </div>
+  <div class="span4">
+    <h2>Recently...</h2>
+    <table class="table table-condensed table-hover">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Model Name</th>
+          <th>Version</th>
+      </thead>
+      <tbody>
+        <tr>          
+          <td>Jan. 23, 2012</td>
+          <td>Heat Flow</td>
+          <td>1.23</td>
+        </tr>
+        <tr>
+          <td>Oct. 14, 2012</td>
+          <td>Borehole Temperature Observation</td>
+          <td>1.6</td>          
+        </tr>
+        <tr>
+          <td>Oct. 23, 2012</td>
+          <td>Unrealistic Content</td>
+          <td>12</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

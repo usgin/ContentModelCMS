@@ -6,6 +6,12 @@ urlpatterns = patterns('contentmodels.views',
   url(r'^contentmodels\.(?P<extension>json|html|xml)$', 'get_all_models'),
   
   # Get a single ContentModel as JSON or HTML
-  url(r'^contentmodel/(?P<id>\d*)\.(?P<extension>json|html|xml)$', 'get_model')
+  url(r'^contentmodel/(?P<id>\d*)\.(?P<extension>json|html|xml)$', 'get_model'),
+  
+  # Homepage
+  url(r'^home/$', 'homepage'),
+  
+  # Model viewing page
+  url(r'^models/$', 'models'),
   
 )

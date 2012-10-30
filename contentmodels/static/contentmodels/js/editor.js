@@ -8,6 +8,7 @@ dojo.require("dijit._editor.plugins.LinkDialog");
 dojo.require("dojox.editor.plugins.ShowBlockNodes");
 dojo.require("dojox.editor.plugins.PasteFromWord");
 dojo.require("dojox.editor.plugins.InsertEntity");
+dojo.require("dijit._editor.plugins.ViewSource");
 
 // headless plugins
 dojo.require("dojox.editor.plugins.NormalizeIndentOutdent");
@@ -27,7 +28,8 @@ dojo.ready(function(){
         "insertOrderedList", "insertUnorderedList", "indent", "outdent", "|",
         "createLink",
         "normalizeindentoutdent", "prettyprint",
-        "autourllink", "dijit._editor.plugins.EnterKeyHandling"
+        "autourllink", "dijit._editor.plugins.EnterKeyHandling",
+        "viewsource"
       ]
     });
   }

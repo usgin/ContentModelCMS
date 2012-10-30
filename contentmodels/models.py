@@ -43,6 +43,12 @@ class ContentModel(models.Model):
     if self.modelversion_set.count() > 0: return self.modelversion_set.latest('date_created')
     else: return None
   
+  # Simply return the latest version number
+  def latest_version_number(self):
+    version = self.latest_version()
+    if version: return version.version
+    else: return None
+  
   # The updated date for an instance is the last time that a version was created
   def date_updated(self):
     version = self.latest_version()
