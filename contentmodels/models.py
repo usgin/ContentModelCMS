@@ -193,6 +193,10 @@ class ModelVersion(models.Model):
     return '<a href="/admin/uriredirect/rewriterule/%s">Edit Rule</a>' % self.rewrite_rule.pk
   rewrite_rule_link.allow_tags = True
   
+  # Return the created date in ISO format
+  def iso_date_created(self):
+    return self.date_created.isoformat()
+  
   # Return an lxml.etree.XMLSchema validator
   def schema_validator(self):
     # I don't know why this isn't working: schema_file = self.xsd_file.open()

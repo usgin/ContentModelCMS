@@ -46,7 +46,8 @@ def as_html(contentmodels):
 def as_atom(contentmodels):
   return render_to_response(
       'contentmodels.xml', 
-      { 'feed': AtomFeed(contentmodels=contentmodels), 'contentmodels': contentmodels }
+      { 'feed': AtomFeed(contentmodels=contentmodels), 'contentmodels': contentmodels },
+      mimetype="application/xml"
     )
 
 #--------------------------------------------------------------------------------------
