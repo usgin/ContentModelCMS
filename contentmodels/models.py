@@ -105,10 +105,14 @@ class ContentModel(models.Model):
   
   def regex_pattern(self):
     return "^%s$" % self.stripped_regex()
-        
+  
+  # Provide this ContentModel's relative URI
+  def relative_uri(self):
+    return '/uri-gin/%s/%s' % (settings.URI_REGISTER_LABEL, self.stripped_regex())
+  
   # Provide this ContentModel's absolute URI
   def absolute_uri(self):
-    return '%s/uri-gin/%s/%s' % (settings.BASE_URL.rstrip('/'), settings.URI_REGISTER_LABEL, self.stripped_regex())
+    return '%s%s' % (settings.BASE_URL.rstrip('/'), self.relative_uri())
   
   # Return a link to this ContentModel's RewriteRule
   def rewrite_rule_link(self):
