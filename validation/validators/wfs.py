@@ -102,7 +102,7 @@ def validate_wfs_form(req):
           }
         
         # Render the results as HTML
-        return render(req, 'wfs-result.html', context)
+        return render(req, 'wfs-results-bootstrap.html', context)
       
     # Otherwise it is treated as a WfsSelectionForm
     else:
