@@ -11,7 +11,9 @@ from django.shortcuts import render
 #   provides some FeatureTypes
 #--------------------------------------------------------------------------------------
 class WfsSelectionForm(forms.Form):
-  wfs_get_capabilities_url = forms.URLField() # Just one field in this form: the WFS GetCapabilities URL
+  wfs_get_capabilities_url = forms.URLField(
+    widget=forms.TextInput(attrs={'class':'span10', 'placeholder':'Enter a WFS GetCapabilities URL'})
+  ) # Just one field in this form: the WFS GetCapabilities URL
   
   # Function to validate the wfs_get_capabilites_url
   def clean_wfs_get_capabilities_url(self):
@@ -45,10 +47,21 @@ class WfsValidationParametersForm(forms.Form):
     
   # Define form fields
   url = forms.URLField(widget=forms.HiddenInput) 
-  content_model = forms.ModelChoiceField(queryset=ContentModel.objects.all())
-  version = forms.ModelChoiceField(queryset=ModelVersion.objects.all())
-  feature_type = forms.ChoiceField(choices=[])
-  number_of_features = forms.IntegerField()
+  content_model = forms.ModelChoiceField(queryset=ContentModel.objects.all(),
+    widget=forms.Select(attrs={'class':'span4'})
+  )
+  version = forms.ModelChoiceField(queryset=ModelVersion.objects.all(),
+    widget=forms.Select(attrs={'class':'span4'})
+  )
+  feature_type = forms.ChoiceField(choices=[],
+    widget=forms.Select(attrs={'class':'span4'})
+  )
+  number_of_features = forms.IntegerField(
+    widget=forms.Select(
+      attrs={'class':'span1'},
+      choices=((1,1), (10,10), (50, 50))
+    )
+  )
 
 #--------------------------------------------------------------------------------------
 # Here is the actual view function for /validate/wfs
@@ -100,11 +113,11 @@ def validate_wfs_form(req):
         # We need to send back a WfsValidationParametersForm, which takes a URL as input
         url = form.data['wfs_get_capabilities_url']
         second_form = WfsValidationParametersForm(url)
-        return render(req, 'wfs-form.html', { 'form': second_form, 'url': url })
+        return render(req, 'wfs-form-bootstrap.html', { 'form': second_form, 'url': url })
         
   # A GET request should just a data-free WfsSelectionForm
   else:
     form = WfsSelectionForm()
     
   # You'll get here if it was a GET request, or if form validation failed
-  return render(req, 'wfs-form.html', { 'form': form })
+  return render(req, 'wfs-form-bootstrap.html', { 'form': form })

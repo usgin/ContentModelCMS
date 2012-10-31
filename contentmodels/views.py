@@ -106,7 +106,9 @@ class AtomFeed(object):
 # Homepage
 #--------------------------------------------------------------------------------------
 def homepage(req):
-  return render_to_response('home.html')
+  models = list(ContentModel.objects.all())
+  models.sort(key=lambda cm: cm.date_updated(), reverse=True)
+  return render_to_response('home.html', { 'recent_models': models[:2] })
   
 #--------------------------------------------------------------------------------------
 # Model view page
