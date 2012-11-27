@@ -1,0 +1,1 @@
+from contentmodel import ContentModelTestCase
