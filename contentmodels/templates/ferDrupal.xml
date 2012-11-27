@@ -9,12 +9,12 @@
     <discussion>{{ cm.discussion }}</discussion>
     <status>{{ cm.status }}</status>
     {% for v in cm.modelversion_set.all %}
-    <version{{ v.pk }}number>{{ v.version }}</version{{ v.pk }}number>
-    <version{{ v.pk }}uri>{{ v.absolute_uri }}</version{{ v.pk }}uri>
-    <version{{ v.pk }}created>{{ v.iso_date_created }}T12:00:00-05:00</version{{ v.pk }}created>
-    <version{{ v.pk }}xlsfile>{{ v.absolute_xls_path }}</version{{ v.pk }}xlsfile>
-    <version{{ v.pk }}xsdfile>{{ v.absolute_xsd_path }}</version{{ v.pk }}xsdfile>
-    <version{{ v.pk }}wfsexample>{{ v.sample_wfs_request }}</version{{ v.pk }}wfsexample>
+    <version{{ forloop.counter }}number>{{ v.version }}</version{{ forloop.counter }}number>
+    <version{{ forloop.counter }}uri>{{ v.absolute_uri }}</version{{ forloop.counter }}uri>
+    <version{{ forloop.counter }}created>{{ v.iso_date_created }}T12:00:00-05:00</version{{ forloop.counter }}created>
+    <version{{ forloop.counter }}xlsfile>{{ v.absolute_xls_path }}</version{{ forloop.counter }}xlsfile>
+    <version{{ forloop.counter }}xsdfile>{{ v.absolute_xsd_path }}</version{{ forloop.counter }}xsdfile>
+    <version{{ forloop.counter }}wfsexample>{{ v.sample_wfs_request }}</version{{ forloop.counter }}wfsexample>
     {% endfor %}
   </item>
   {% endfor %}
