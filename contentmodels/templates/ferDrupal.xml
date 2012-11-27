@@ -3,7 +3,7 @@
   {% for cm in contentmodels %}
   <item>
     <title>{{ cm.title }}</title>
-    <uri>{{ cm.uri }}</uri>
+    <uri>{{ cm.absolute_uri }}</uri>
     <lastupdate>{{ cm.iso_date_updated }}T12:00:00-05:00</lastupdate>
     <description>{{ cm.description }}</description>
     <discussion>{{ cm.discussion }}</discussion>
