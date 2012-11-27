@@ -25,6 +25,7 @@ def get_model(request, id, extension):
 def view_models(contentmodels, extension):
   if extension == 'json': return as_json(contentmodels)
   elif extension == 'xml': return as_atom(contentmodels)
+  elif extension == 'drupal': return fer_drupal(contentmodels)
   else: return as_html(contentmodels)
   
 #--------------------------------------------------------------------------------------
@@ -48,6 +49,14 @@ def as_atom(contentmodels):
       'contentmodels.xml', 
       { 'feed': AtomFeed(contentmodels=contentmodels), 'contentmodels': contentmodels },
       mimetype="application/xml"
+    )
+    
+#--------------------------------------------------------------------------------------
+# Convert a set of ContentModel instances to XML (fer Drupal) and send as an HttpResponse
+#--------------------------------------------------------------------------------------
+def fer_drupal(contentmodels):
+  return render_to_response(
+      'ferDrupal.xml', { 'contentmodels': contentmodels }, mimetype="application/xml"
     )
 
 #--------------------------------------------------------------------------------------

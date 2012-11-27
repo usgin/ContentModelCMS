@@ -1,6 +1,6 @@
 <ul id="all-content-models">
   {% for cm in contentmodels %}
-    <li id="content-model-{{ cm.id }}">
+    <li id="content-model-{{ cm.id }}" class="content-model">
       <dl>
         <dt>Title: </dt>
         <dd class='cm-title'>{{ cm.title }}</dd>
@@ -26,7 +26,7 @@
         <dd class='cm-versions'>
           <ul>
             {% for v in cm.modelversion_set.all %}
-              <li id="model-version-{{ v.id }}">
+              <li id="model-version-{{ v.id }}" class="model-version">
                 <dl>
                   <dt>Version: </dt>
                   <dd class='v-version'>{{ v.version }}</dd>
