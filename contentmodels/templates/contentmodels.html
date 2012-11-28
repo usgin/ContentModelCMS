@@ -14,13 +14,13 @@
         <dd class='cm-date-updated'>{{ cm.date_updated }}</dd>
         
         <dt>Description: </dt>
-        <dd class='cm-description'>{{ cm.description|safe }}</dd>
+        <dd class='cm-description'>{{ cm.cleaned_description|safe }}</dd>
         
         <dt>Discussion: </dt>
-        <dd class='cm-discussion'>{{ cm.discussion|safe }}</dd>
+        <dd class='cm-discussion'>{{ cm.cleaned_discussion|safe }}</dd>
         
         <dt>Status: </dt>
-        <dd class='cm-status'>{{ cm.status|safe }}</dd>
+        <dd class='cm-status'>{{ cm.cleaned_status|safe }}</dd>
         
         <dt>Available Versions: </dt>
         <dd class='cm-versions'>

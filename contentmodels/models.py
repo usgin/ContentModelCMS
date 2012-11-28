@@ -6,6 +6,7 @@ from django.db.models.signals import pre_save, post_save, post_delete
 from uriconfigure import adjust_rewrite_rule, delete_rewrite_rule, update_related_rewrite_rules, RewriteRule
 from os import path
 from lxml import etree
+import re
 
 #--------------------------------------------------------------------------------------
 # Function that gets the path for a uploaded files.
@@ -13,6 +14,12 @@ from lxml import etree
 #--------------------------------------------------------------------------------------
 def get_file_path(instance, filename):
   return '%s/%s/%s' % (instance.content_model.folder_path(), instance.version, filename)
+  
+#--------------------------------------------------------------------------------------
+# Function that strips HTML tags (except anchors) from strings     
+#--------------------------------------------------------------------------------------
+def removeTags(string_to_clean):
+  return re.sub('</(?!a)[^>]*>|<[^/a][^>]*>|&nbsp;', '', string_to_clean)
 
 #--------------------------------------------------------------------------------------
 # This class represent specific USGIN content-models, which are built to convey
@@ -29,6 +36,16 @@ class ContentModel(models.Model):
   discussion = models.TextField(blank=True)
   status = models.TextField(blank=True)
   rewrite_rule = models.OneToOneField(RewriteRule, null=True, blank=True)
+  
+  # Functions to return cleaned-up properties
+  def cleaned_description(self):
+    return removeTags(self.description)
+    
+  def cleaned_discussion(self):
+    return removeTags(self.discussion)
+    
+  def cleaned_status(self):
+    return removeTags(self.status)
   
   # Define the "display name" for an instance
   def __unicode__(self):

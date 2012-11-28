@@ -19,9 +19,9 @@
       <cm:title>{{ cm.title }}</cm:title>
       <cm:uri>{{ cm.absolute_uri }}</cm:uri>
       <cm:lastupdate>{{ cm.iso_date_updated }}T12:00:00-05:00</cm:lastupdate>
-      <cm:description>{{ cm.description }}</cm:description>
-      <cm:discussion>{{ cm.discussion }}</cm:discussion>
-      <cm:status>{{ cm.status }}</cm:status>
+      <cm:description>{{ cm.cleaned_description }}</cm:description>
+      <cm:discussion>{{ cm.cleaned_discussion }}</cm:discussion>
+      <cm:status>{{ cm.cleaned_status }}</cm:status>
       <cm:versions>
         {% for v in cm.modelversion_set.all %}
         <cm:version>

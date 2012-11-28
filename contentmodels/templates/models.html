@@ -29,12 +29,12 @@
           <a class="btn btn-small" href="{{ cm.absolute_latest_xls_path }}"><i class="icon-file pull-left"></i> Excel Template (.xls)</a>
         </div>
       </div>
-      <p>{{ cm.description|safe }}</p>
+      <p>{{ cm.cleaned_description|safe }}</p>
       <dl>
         <dt>Discussion</dt>
-        <dd>{{ cm.discussion|safe }}</dd>
+        <dd>{{ cm.cleaned_discussion|safe }}</dd>
         <dt>Status</dt>
-        <dd>{{ cm.status|safe }}</dd>
+        <dd>{{ cm.cleaned_status|safe }}</dd>
       </dl>
       <table class="table table-striped">
         <thead>
