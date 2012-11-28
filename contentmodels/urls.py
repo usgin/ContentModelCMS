@@ -1,4 +1,5 @@
 from django.conf.urls import patterns, url
+from django.conf import settings
 
 urlpatterns = patterns('contentmodels.views',
 
@@ -15,3 +16,9 @@ urlpatterns = patterns('contentmodels.views',
   url(r'^models/$', 'models'),
   
 )
+
+# Serve static files
+if settings.DEBUG:
+  urlpatterns += patterns('',
+    url(r'^files/(?P<path>.*)$', 'django.views.static.serve', { 'document_root': settings.MEDIA_ROOT }),
+  )
