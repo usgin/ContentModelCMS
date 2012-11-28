@@ -80,7 +80,10 @@ class ValidationResults():
         
       # Grab the error log from the etree.XMLSchema object
       self.errors = schema.error_log
-  
+      
+      # De-duplicate the error log
+      self.deduplicate_errors()
+      
   # Function to count the number of valid elements
   def valid_count(self):
     return len([ result for result in self.results if result['valid'] ])
@@ -88,5 +91,10 @@ class ValidationResults():
   # Function to count the number of invalid elements
   def invalid_count(self):
     return len([ result for result in self.results if not result['valid'] ])
+    
+  # Function to remove duplicate errors from the log
+  def deduplicate_errors(self):
+    self.errors = list(set(self.errors))
+      
     
     
