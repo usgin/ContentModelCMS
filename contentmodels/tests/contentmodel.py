@@ -28,25 +28,26 @@ class ContentModelTestCase(TestCase):
     dummy_xsd_file = File(dummy_xsd_content, "dummyFile.xsd")
     dummy_xls_file = File(dummy_xls_content, "dummyFile.xls")
     
-    # Create a version right now
-    v1 = ModelVersion.objects.create(
-        content_model = self.example,
-        version = "2.0",
-        xsd_file = dummy_xsd_file,
-        xls_file = dummy_xsd_file
-      )
-      
     # Create an older version
     v2 = ModelVersion.objects.create(
         content_model = self.example,
         version = "1.0",
-        date_created = datetime.datetime.now() - datetime.timedelta(days=3),
+        #date_created = datetime.datetime.now() - datetime.timedelta(days=3),
         xsd_file = dummy_xsd_file,
         xls_file = dummy_xls_file
       )
+    
+    # Create a version right now
+    v1 = ModelVersion.objects.create(
+        content_model = self.example,
+        version = "2.0",
+        #date_created = datetime.datetime.now(),
+        xsd_file = dummy_xsd_file,
+        xls_file = dummy_xsd_file
+      )
       
     # Return the newer version
-    return v2
+    return {'new': v1, 'old': v2}
 
   def stripped_regex(self):
     return "dataschema/%s/" % self.example.label
@@ -65,7 +66,7 @@ class ContentModelTestCase(TestCase):
   
   def test_latest_version(self):
     """The model's latest_version should return the correct version"""
-    v = self.createTwoVersions()    
+    v = self.createTwoVersions()['new']   
     self.assertEqual(self.example.latest_version(), v)
         
   def test_latest_version_number_for_null(self):
@@ -74,7 +75,7 @@ class ContentModelTestCase(TestCase):
       
   def test_latest_version_number(self):
     """The model's latest_version_number should return the correct number"""
-    v = self.createTwoVersions()
+    v = self.createTwoVersions()['new']
     self.assertEqual(self.example.latest_version_number(), v.version)
     
   def test_date_updated_for_null(self):
@@ -83,7 +84,7 @@ class ContentModelTestCase(TestCase):
     
   def test_date_updated(self):
     """The model's date_updated should match the creation date of the latest version"""
-    v = self.createTwoVersions()
+    v = self.createTwoVersions()['new']
     self.assertEqual(self.example.date_updated(), v.date_created)
     
   def test_iso_date_updated_for_null(self):
@@ -92,7 +93,7 @@ class ContentModelTestCase(TestCase):
     
   def test_iso_date_updated(self):
     """The model's iso_date_updated should be an ISO representation of the latest version's creation date"""
-    v = self.createTwoVersions()
+    v = self.createTwoVersions()['new']
     self.assertEqual(self.example.iso_date_updated(), v.date_created.isoformat())
     
   #Created by Genhan
@@ -102,7 +103,7 @@ class ContentModelTestCase(TestCase):
  
   def test_absolute_latest_xsd_path(self):
     """The xsd file should be for the latest version"""
-    v = self.createTwoVersions()
+    v = self.createTwoVersions()['new']
     v_abs_path = '%s%s' % (settings.BASE_URL, v.xsd_file.url)
     self.assertEqual(self.example.absolute_latest_xsd_path(), v_abs_path)
     
@@ -112,7 +113,7 @@ class ContentModelTestCase(TestCase):
   
   def test_absolute_latest_xls_path(self):
     """The xls file should be for the latest version"""
-    v = self.createTwoVersions()
+    v = self.createTwoVersions()['new']
     v_abs_path = '%s%s' % (settings.BASE_URL, v.xls_file.url)
     self.assertEqual(self.example.absolute_latest_xls_path(), v_abs_path)
     
@@ -122,7 +123,7 @@ class ContentModelTestCase(TestCase):
   
   def test_latest_xsd_link(self):
     """There should be a link element for the latest version's xsd file"""
-    v = self.createTwoVersions()
+    v = self.createTwoVersions()['new']
     v_link = '<a href="%s%s">%s</a>' % (settings.BASE_URL, v.xsd_file.url, v.xsd_file.name.split('/')[-1])
     self.assertEqual(self.example.latest_xsd_link(), v_link)
     
@@ -132,7 +133,7 @@ class ContentModelTestCase(TestCase):
   
   def test_latest_xls_link(self):
     """There should be a link element for the latest version's xls file"""
-    v = self.createTwoVersions()
+    v = self.createTwoVersions()['new']
     v_link = '<a href="%s%s">%s</a>' % (settings.BASE_URL, v.xls_file.url, v.xls_file.name.split('/')[-1])
     self.assertEqual(self.example.latest_xls_link(), v_link)
   
@@ -175,7 +176,19 @@ class ContentModelTestCase(TestCase):
     url = '<a href="/admin/uriredirect/rewriterule/%s">Edit Rule</a>' % self.example.rewrite_rule.pk
     self.assertEqual(self.example.rewrite_rule_link(), url)
 
-
+  def test_serialized(self):
+    """The serialized should return a json object"""
+    vs = self.createTwoVersions()
+    expect_json = {
+      'title': self.example.title,
+      'uri': self.example.absolute_uri(),
+      'description': self.example.description,
+      'discussion': self.example.discussion,
+      'status': self.example.status,
+      'date_updated': self.example.iso_date_updated(),
+      'versions': [ mv.serialized() for mv in self.example.modelversion_set.all() ]
+    }    
+    self.assertEqual(self.example.serialized(), expect_json)
   
   
   
