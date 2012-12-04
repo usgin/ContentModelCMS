@@ -118,10 +118,10 @@ class ContentModel(models.Model):
     
   # Return RegEx pattern for use in UriRegister module
   def stripped_regex(self):
-    return "xmlschema/%s/" % self.label
+    return "dataschema/%s/" % self.label
   
   def regex_pattern(self):
-    return "^%s$" % self.stripped_regex()
+    return '^%s(\.[a-zA-Z]{3,4}|/)?$' % self.stripped_regex()
   
   # Provide this ContentModel's relative URI
   def relative_uri(self):
@@ -167,6 +167,12 @@ class ModelVersion(models.Model):
   sample_wfs_request = models.CharField(max_length=2000, blank=True)
   rewrite_rule = models.OneToOneField(RewriteRule, null=True, blank=True)
   
+  # Return the first-decimal, or "Major" version number. In the case of version 1.23 this would be 1.2
+  def major_version(self):
+    m = re.match('\d*\.\d{1}', self.version)
+    if m: return m.group(0)
+    else: return None
+  
   # Define the "display name" for an instance
   def __unicode__(self):
     return '%s v. %s' % (self.content_model.title, self.version)
@@ -203,7 +209,7 @@ class ModelVersion(models.Model):
   
   # Return RegEx pattern for use in UriRegister module
   def regex_pattern(self):
-    return "^%s/%s$" % (self.content_model.stripped_regex().rstrip('/'), self.version)
+    return '^%s/%s(\.[a-zA-Z]{3,4}|/)?$' % (self.content_model.stripped_regex().rstrip('/'), self.version)
   
   # Return a link to this ModelVersion's RewriteRule
   def rewrite_rule_link(self):
